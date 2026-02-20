@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Jogo de Luta</title>
+
+<style>
+body {
+  background: black;
+  overflow: hidden;
+}
+
+.player {
+  position: absolute;
+  bottom: 50px;
+}
+
+.player img {
+  width: 120px;
+}
+
+#p1 { left: 100px; }
+#p2 { left: 600px; }
+
+.barra {
+  position: absolute;
+  top: 20px;
+  width: 300px;
+  height: 20px;
+  background: red;
+}
+
+#vida1 { left: 50px; }
+#vida2 { right: 50px; }
+
+.vida {
+  height: 100%;
+  background: lime;
+  width: 100%;
+}
+</style>
+</head>
+<body>
+
+<div id="vida1" class="barra"><div id="vidaP1" class="vida"></div></div>
+<div id="vida2" class="barra"><div id="vidaP2" class="vida"></div></div>
+
+<div id="p1" class="player">
+  <img id="p1img" src="./Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png">
+</div>
+
+<!-- P2 SEM IMAGEM DEFINIDA -->
+<div id="p2" class="player">
+  <img id="p2img">
+</div>
+
+<script>
+let p1X = 100;
+let p2X = 600;
+
+let p1Vida = 100;
+let p2Vida = 100;
+
+let p1Defesa = false;
+let p2Defesa = false;
+
+let p1Cooldown = 0;
+let p2Cooldown = 0;
+
+const p1 = document.getElementById("p1");
+const p2 = document.getElementById("p2");
+
+const p1Img = document.getElementById("p1img");
+const vidaP1 = document.getElementById("vidaP1");
+const vidaP2 = document.getElementById("vidaP2");
+
+// SPRITES PLAYER 1
+const P1_IDLE = "./Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png";
+const P1_SOCO = "./Gemini_Generated_Image_2703an2703an2703.png";
+const P1_DEFESA = "./Gemini_Generated_Image_l3yczwl3yczwl3yc.png";
+const P1_CORRER = "./Gemini_Generated_Image_2c86rh2c86rh2c86.png";
+
+function trocarImagem(sprite) {
+  p1Img.src = sprite;
+}
+
+document.addEventListener("keydown", e => {
+
+  if (e.key === "a") {
+    p1X -= 10;
+    trocarImagem(P1_CORRER);
+  }
+
+  if (e.key === "d") {
+    p1X += 10;
+    trocarImagem(P1_CORRER);
+  }
+
+  if (e.key === "s") {
+    p1Defesa = true;
+    trocarImagem(P1_DEFESA);
+  }
+
+  if (e.key === "w" && p1Cooldown <= 0) {
+    atacar();
+  }
+});
+
+document.addEventListener("keyup", e => {
+
+  if (e.key === "a" || e.key === "d" || e.key === "s") {
+    trocarImagem(P1_IDLE);
+    p1Defesa = false;
+  }
+});
+
+function atacar() {
+  if (Math.abs(p1X - p2X) <= 80) {
+    trocarImagem(P1_SOCO);
+
+    let dano = p2Defesa ? 5 : 10;
+    p2Vida -= dano;
+    p1Cooldown = 20;
+
+    setTimeout(() => trocarImagem(P1_IDLE), 200);
+  }
+}
+
+function atualizar() {
+
+  if (p1Cooldown > 0) p1Cooldown--;
+  if (p2Cooldown > 0) p2Cooldown--;
+
+  // IA simples (sem sprite)
+  if (Math.random() < 0.02 && p2Cooldown <= 0) {
+    if (Math.abs(p2X - p1X) <= 80) {
+      let dano = p1Defesa ? 5 : 10;
+      p1Vida -= dano;
+      p2Cooldown = 20;
+    }
+  }
+
+  if (p2X > p1X) p2X -= 2;
+  else p2X += 2;
+
+  p1.style.left = p1X + "px";
+  p2.style.left = p2X + "px";
+
+  vidaP1.style.width = p1Vida + "%";
+  vidaP2.style.width = p2Vida + "%";
+
+  if (p1Vida <= 0) {
+    alert("Player 2 venceu!");
+    location.reload();
+  }
+
+  if (p2Vida <= 0) {
+    alert("Player 1 venceu!");
+    location.reload();
+  }
+
+  requestAnimationFrame(atualizar);
+}
+
+atualizar();
+</script>
+
+</body>
+</html>
