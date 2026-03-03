@@ -1,292 +1,297 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt">
+
 <head>
-<meta charset="UTF-8">
-<title>Jogo de Luta</title>
+  <meta charset="UTF-8">
+  <title>Jogo de Luta</title>
 
-<style>
-body{
-  margin:0;
-  overflow:hidden;
-  background:#111;
-}
+  <style>
+    body {
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+      overflow: hidden;
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+    }
 
-#arena{
-  position:relative;
-  width:100vw;
-  height:100vh;
-}
+    #arena {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(to bottom, transparent 70%, #8B4513 100%);
+    }
 
-.player{
-  position:absolute;
-  bottom:0;
-}
+    .player {
+      position: absolute;
+      bottom: 80px;
+      transition: left 0.2s ease;
+      z-index: 10;
+    }
 
-.player img{
-  width:200px;
-}
+    .player img {
+      width: 120px;
+      height: 140px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      transition: opacity 0.3s ease;
+      border: 2px solid transparent;
+    }
 
-.barra{
-  position:absolute;
-  top:20px;
-  width:40%;
-  height:20px;
-  background:red;
-}
+    .player.atacando img {
+      border-color: #ffaa00 !important;
+      box-shadow: 0 0 20px #ffaa00;
+      transform: scale(1.15);
+    }
 
-#vidaP1{ left:5%; }
-#vidaP2{ right:5%; }
+    .player.especial img {
+      border-color: #ff00ff !important;
+      box-shadow: 0 0 30px #ff00ff;
+      transform: scale(1.2);
+    }
 
-.vida{
-  height:100%;
-  background:lime;
-  width:100%;
-}
-</style>
+    #p1 {
+      left: 100px;
+    }
+
+    #p2 {
+      right: 100px;
+    }
+
+    .barra {
+      position: absolute;
+      top: 20px;
+      width: 250px;
+      height: 25px;
+      background: linear-gradient(90deg, #ff4444, #cc0000);
+      border: 3px solid #660000;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    #vida1 {
+      left: 50px;
+    }
+
+    #vida2 {
+      right: 50px;
+    }
+
+    .vida {
+      height: 100%;
+      background: linear-gradient(90deg, #00ff88, #00cc66);
+      border-radius: 12px;
+      transition: width 0.5s ease;
+      box-shadow: 0 0 10px #00ff88;
+      position: relative;
+    }
+
+    .vida::after {
+      content: attr(data-percent) '%';
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    /* 🎮 CONTROLES VISUAIS */
+    #controles {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 14px;
+      max-width: 450px;
+      text-align: center;
+      border: 2px solid #00ff88;
+    }
+
+    #controles h3 {
+      margin: 0 0 10px 0;
+      color: #00ff88;
+    }
+  </style>
 </head>
 
 <body>
+  <div id="arena">
+    <div id="vida1" class="barra">
+      <div id="vidaP1" class="vida" data-percent="100">PLAYER 1</div>
+    </div>
 
-<div id="arena">
+    <div id="vida2" class="barra">
+      <div id="vidaP2" class="vida" data-percent="100">PLAYER 2</div>
+    </div>
 
-  <div id="vidaP1" class="barra">
-    <div id="vida1" class="vida"></div>
+    <!-- 🎮 CONTROLES ADICIONADOS -->
+    <div id="controles">
+      <h3>🎮 CONTROLES</h3>
+      <div><strong>P1:</strong> A/D=Mover | S=Defesa | <span style="color:#ff6600">W=Soco</span> | <span
+          style="color:#ffaa00">E=Chute</span> | <span style="color:#ff00ff">Q=Especial</span></div>
+      <div><strong>P2:</strong> ←→=Mover | ↓=Defesa | <span style="color:#ff6600">↑=Soco</span> | <span
+          style="color:#ffaa00">O=Chute</span> | <span style="color:#ff00ff">P=Especial</span></div>
+    </div>
+
+    <div id="p1" class="player">
+      <img id="p1img" src="./Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png">
+    </div>
+
+    <div id="p2" class="player">
+      <img id="p2img" src="./Gemini_Generated_Image_l88erjl88erjl88e.png">
+    </div>
   </div>
 
-  <div id="vidaP2" class="barra">
-    <div id="vida2" class="vida"></div>
-  </div>
+  <script>
+    let p1X = 100;
+    let p2X = window.innerWidth - 220;
+    let p1Vida = 100;
+    let p2Vida = 100;
+    let p1Defesa = false;
+    let p2Defesa = false;
+    let p1Cooldown = 0;
+    let p2Cooldown = 0;
+    let keysPressed = new Set();
 
-  <div id="p1" class="player">
-    <img id="p1img" src="./Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png">
-  </div>
+    const p1 = document.getElementById("p1");
+    const p2 = document.getElementById("p2");
+    const p1Img = document.getElementById("p1img");
+    const p2Img = document.getElementById("p2img");
+    const vidaP1 = document.getElementById("vidaP1");
+    const vidaP2 = document.getElementById("vidaP2");
 
-  <div id="p2" class="player">
-    <img id="p2img" src="./Gemini_Generated_Image_l88erjl88erjl88e.png">
-  </div>
+    const spritesP1 = {
+      IDLE: "./Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png",
+      SOCO: "./Gemini_Generated_Image_2703an2703an2703.png",
+      CHUTE: "./Gemini_Generated_Image_l3yczwl3yczwl3yc.png",
+      DEFESA: "./Gemini_Generated_Image_gw8dvmgw8dvmgw8d.png",
+      CORRER: "./Gemini_Generated_Image_2c86rh2c86rh2c86.png",
+      ESPECIAL: "./Gemini_Generated_Image_3d02v03d02v03d02.png"
+    };
 
-</div>
+    const spritesP2 = {
+      IDLE: "./Gemini_Generated_Image_l88erjl88erjl88e.png",
+      SOCO: "./Gemini_Generated_Image_inom8ninom8ninom.png",
+      CHUTE: "./Gemini_Generated_Image_riho7oriho7oriho.png",
+      DEFESA: "./Gemini_Generated_Image_l88erjl88erjl88e.png",
+      CORRER: "./Gemini_Generated_Image_577txo577txo577t.png",
+      ESPECIAL: "./Gemini_Generated_Image_y3ltr0y3ltr0y3lt.png",
+      ESPECIAL2: "./Gemini_Generated_Image_riho7oriho7oriho.png",
+      ESPECIAL3: "./Gemini_Generated_Image_bnydkebnydkebnyd.png"
+    };
 
-<script>
+    function trocarImagem(player, estado) {
+      const img = player === 1 ? p1Img : p2Img;
+      const playerDiv = player === 1 ? p1 : p2;
+      const sprites = player === 1 ? spritesP1 : spritesP2;
 
-let p1X = 100;
-let p2X = window.innerWidth - 300;
-
-let p1Vida = 100;
-let p2Vida = 100;
-
-let p1Defesa = false;
-let p2Defesa = false;
-
-let p1Cooldown = 0;
-let p2Cooldown = 0;
-
-let p1Atacando = false;
-let p2Atacando = false;
-
-let keysPressed = new Set();
-
-const p1 = document.getElementById("p1");
-const p2 = document.getElementById("p2");
-const p1Img = document.getElementById("p1img");
-const p2Img = document.getElementById("p2img");
-
-const vida1 = document.getElementById("vida1");
-const vida2 = document.getElementById("vida2");
-
-const spritesP1 = {
-  IDLE:"./Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png",
-  SOCO:"./Gemini_Generated_Image_2703an2703an2703.png",
-  DEFESA:"./Gemini_Generated_Image_l3yczwl3yczwl3yc.png",
-  CORRER:"./Gemini_Generated_Image_2c86rh2c86rh2c86.png",
-  ESPECIAL:"./Gemini_Generated_Image_3d02v03d02v03d02.png"
-};
-
-const spritesP2 = {
-  IDLE:"./Gemini_Generated_Image_l88erjl88erjl88e.png",
-  SOCO:"./Gemini_Generated_Image_inom8ninom8ninom.png",
-  CHUTE:"./Gemini_Generated_Image_riho7oriho7oriho.png",
-  DEFESA:"./Gemini_Generated_Image_l88erjl88erjl88e.png",
-  CORRER:"./Gemini_Generated_Image_577txo577txo577t.png",
-  ESPECIAL1:"./Gemini_Generated_Image_l88erjl88erjl88e.png",
-  ESPECIAL2:"./Gemini_Generated_Image_riho7oriho7oriho.png",
-  ESPECIAL3:"./Gemini_Generated_Image_bnydkebnydkebnyd.png"
-};
-
-function trocarImagem(player, estado){
-  if(player===1 && spritesP1[estado]) p1Img.src = spritesP1[estado];
-  if(player===2 && spritesP2[estado]) p2Img.src = spritesP2[estado];
-}
-
-function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
-
-document.addEventListener("keydown",e=>{
-  keysPressed.add(e.key.toLowerCase());
-});
-
-document.addEventListener("keyup",e=>{
-  keysPressed.delete(e.key.toLowerCase());
-});
-
-document.addEventListener("keydown",e=>{
-
-  if(e.repeat) return;
-
-  if(e.key==="w" && p1Cooldown<=0) atacar(1,"SOCO");
-  if(e.key==="q" && p1Cooldown<=0) especial(1);
-
-  if(e.key==="ArrowUp" && p2Cooldown<=0) atacar(2,"SOCO");
-  if(e.key==="o" && p2Cooldown<=0) atacar(2,"CHUTE");
-  if(e.key==="p" && p2Cooldown<=0) especial(2);
-});
-
-function atacar(player,tipo){
-
-  if(player===1){
-    p1Atacando=true;
-    trocarImagem(1,tipo);
-    p1Cooldown=40;
-
-    if(Math.abs(p1X-p2X)<150){
-      let dano= tipo==="SOCO"?10:15;
-      if(p2Defesa) dano*=0.5;
-      p2Vida-=dano;
-    }
-
-    setTimeout(()=>{
-      p1Atacando=false;
-      trocarImagem(1,"IDLE");
-    },300);
-  }
-
-  if(player===2){
-    p2Atacando=true;
-    trocarImagem(2,tipo);
-    p2Cooldown=40;
-
-    if(Math.abs(p1X-p2X)<150){
-      let dano= tipo==="SOCO"?10:15;
-      if(p1Defesa) dano*=0.5;
-      p1Vida-=dano;
-    }
-
-    setTimeout(()=>{
-      p2Atacando=false;
-      trocarImagem(2,"IDLE");
-    },300);
-  }
-}
-
-function especial(player){
-
-  if(player===1){
-    p1Atacando=true;
-    trocarImagem(1,"ESPECIAL");
-    p1Cooldown=100;
-
-    if(Math.abs(p1X-p2X)<180){
-      let dano=30;
-      if(p2Defesa) dano*=0.5;
-      p2Vida-=dano;
-    }
-
-    setTimeout(()=>{
-      p1Atacando=false;
-      trocarImagem(1,"IDLE");
-    },500);
-  }
-
-  if(player===2){
-    p2Atacando=true;
-    p2Cooldown=120;
-
-    let seq=["ESPECIAL1","ESPECIAL2","ESPECIAL3"];
-    let i=0;
-
-    let intervalo=setInterval(()=>{
-      trocarImagem(2,seq[i]);
-      i++;
-      if(i>=seq.length){
-        clearInterval(intervalo);
-        p2Atacando=false;
-        trocarImagem(2,"IDLE");
+      if (sprites[estado]) {
+        img.src = sprites[estado];
+        playerDiv.classList.remove('atacando', 'especial');
+        if (estado === 'SOCO' || estado === 'CHUTE') playerDiv.classList.add('atacando');
+        if (estado.includes('ESPECIAL')) playerDiv.classList.add('especial');
       }
-    },200);
-
-    if(Math.abs(p1X-p2X)<180){
-      let dano=35;
-      if(p1Defesa) dano*=0.5;
-      p1Vida-=dano;
     }
-  }
-}
 
-function processarMovimento(){
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
-  if(keysPressed.has("a") && p1X>0){
-    p1X-=6;
-    if(!p1Atacando) trocarImagem(1,"CORRER");
-  }
+    document.addEventListener("keydown", e => keysPressed.add(e.key.toLowerCase()));
+    document.addEventListener("keyup", e => keysPressed.delete(e.key.toLowerCase()));
 
-  if(keysPressed.has("d") && p1X<window.innerWidth-250){
-    p1X+=6;
-    if(!p1Atacando) trocarImagem(1,"CORRER");
-  }
+    document.addEventListener("keydown", e => {
+      if (e.key.toLowerCase() === 'w' && p1Cooldown <= 0) atacar(1, 'SOCO');
+      if (e.key.toLowerCase() === 'e' && p1Cooldown <= 0) atacar(1, 'CHUTE');
+      if (e.key.toLowerCase() === 'q' && p1Cooldown <= 0) especial(1);
 
-  if(keysPressed.has("s")){
-    p1Defesa=true;
-    if(!p1Atacando) trocarImagem(1,"DEFESA");
-  }else{
-    p1Defesa=false;
-  }
+      if (e.key === 'ArrowUp' && p2Cooldown <= 0) atacar(2, 'SOCO');
+      if (e.key.toLowerCase() === 'o' && p2Cooldown <= 0) atacar(2, 'CHUTE');
+      if (e.key.toLowerCase() === 'p' && p2Cooldown <= 0) especial(2);
+    });
 
-  if(keysPressed.has("arrowleft") && p2X>0){
-    p2X-=6;
-    if(!p2Atacando) trocarImagem(2,"CORRER");
-  }
+    function processarMovimento() {
+      if (keysPressed.has('a') && p1X > 20) { p1X -= 3; trocarImagem(1, 'CORRER'); }
+      if (keysPressed.has('d') && p1X < window.innerWidth - 300) { p1X += 3; trocarImagem(1, 'CORRER'); }
+      if (keysPressed.has('s')) { p1Defesa = true; trocarImagem(1, 'DEFESA'); }
+      else if (!keysPressed.has('a') && !keysPressed.has('d')) trocarImagem(1, 'IDLE');
 
-  if(keysPressed.has("arrowright") && p2X<window.innerWidth-250){
-    p2X+=6;
-    if(!p2Atacando) trocarImagem(2,"CORRER");
-  }
+      if (keysPressed.has('arrowleft') && p2X > 220) { p2X -= 3; trocarImagem(2, 'CORRER'); }
+      if (keysPressed.has('arrowright') && p2X < window.innerWidth - 120) { p2X += 3; trocarImagem(2, 'CORRER'); }
+      if (keysPressed.has('arrowdown')) { p2Defesa = true; trocarImagem(2, 'DEFESA'); }
+      else if (!keysPressed.has('arrowleft') && !keysPressed.has('arrowright')) trocarImagem(2, 'IDLE');
+    }
 
-  if(keysPressed.has("arrowdown")){
-    p2Defesa=true;
-    if(!p2Atacando) trocarImagem(2,"DEFESA");
-  }else{
-    p2Defesa=false;
-  }
+    function atacar(player, tipo) {
+      const atacanteX = player === 1 ? p1X : p2X;
+      const alvoX = player === 1 ? p2X : p1X;
+      if (Math.abs(atacanteX - alvoX) <= 140) {
+        if (player === 1) p1Cooldown = 40; else p2Cooldown = 20;
+        trocarImagem(player, tipo);
+        const dano = (player === 1 ? p2Defesa : p1Defesa) ? 6 : (tipo === 'CHUTE' ? 14 : 11);
+        if (player === 1) p2Vida -= dano; else p1Vida -= dano;
 
-  if(!p1Atacando && !keysPressed.has("a") && !keysPressed.has("d") && !keysPressed.has("s")){
-    trocarImagem(1,"IDLE");
-  }
+        // TREMOR
+        document.body.style.animation = 'tremor 0.3s';
+        setTimeout(() => document.body.style.animation = 'none', 300);
 
-  if(!p2Atacando && !keysPressed.has("arrowleft") && !keysPressed.has("arrowright") && !keysPressed.has("arrowdown")){
-    trocarImagem(2,"IDLE");
-  }
-}
+        setTimeout(() => trocarImagem(player, 'IDLE'), 800);
+      }
+    }
 
-function atualizar(){
+    function especial(player) {
+      if (player === 1 && p1Cooldown <= 0) {
+        p1Cooldown = 120;
+        trocarImagem(1, 'ESPECIAL');
+        p2Vida -= p2Defesa ? 18 : 35;
+        document.body.style.filter = 'brightness(1.5)';
+        setTimeout(() => {
+          document.body.style.filter = 'none';
+          trocarImagem(1, 'IDLE');
+        }, 1200);
+      }
 
-  processarMovimento();
+      if (player === 2 && p2Cooldown <= 0) {
+        p2Cooldown = 150;
+        trocarImagem(2, 'ESPECIAL');
+        setTimeout(() => trocarImagem(2, 'ESPECIAL2'), 400);
+        setTimeout(() => {
+          trocarImagem(2, 'ESPECIAL3');
+          const dano = p1Defesa ? 25 : 45;
+          p1Vida -= dano;
+        }, 800);
+        setTimeout(() => trocarImagem(2, 'IDLE'), 1500);
+      }
+    }
 
-  if(p1Cooldown>0) p1Cooldown--;
-  if(p2Cooldown>0) p2Cooldown--;
+    function atualizar() {
+      processarMovimento();
+      if (p1Cooldown > 0) p1Cooldown--;
+      if (p2Cooldown > 0) p2Cooldown--;
+      p1X = clamp(p1X, 20, window.innerWidth - 300);
+      p2X = clamp(p2X, 220, window.innerWidth - 120);
+      p1.style.left = p1X + "px";
+      p2.style.left = p2X + "px";
+      vidaP1.style.width = Math.max(0, p1Vida) + "%";
+      vidaP2.style.width = Math.max(0, p2Vida) + "%";
+      vidaP1.setAttribute('data-percent', Math.round(Math.max(0, p1Vida)));
+      vidaP2.setAttribute('data-percent', Math.round(Math.max(0, p2Vida)));
 
-  p1Vida=clamp(p1Vida,0,100);
-  p2Vida=clamp(p2Vida,0,100);
+      if (p1Vida <= 0) { alert("🏆 PLAYER 2 VENCEU! F5 p/ novo jogo"); location.reload(); }
+      if (p2Vida <= 0) { alert("🏆 PLAYER 1 VENCEU! F5 p/ novo jogo"); location.reload(); }
+      requestAnimationFrame(atualizar);
+    }
 
-  vida1.style.width=p1Vida+"%";
-  vida2.style.width=p2Vida+"%";
+    // TREMOR CSS
+    const style = document.createElement('style');
+    style.textContent = '@keyframes tremor{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}50%{transform:translateX(5px);}75%{transform:translateX(-3px);}}body{animation-fill-mode:both;}';
+    document.head.appendChild(style);
 
-  p1.style.left=p1X+"px";
-  p2.style.left=p2X+"px";
-
-  requestAnimationFrame(atualizar);
-}
-
-atualizar();
-
-</script>
+    atualizar();
+  </script>
 </body>
+
 </html>
