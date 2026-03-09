@@ -3,28 +3,27 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Jogo de Luta</title>
+  <title>Jogo de Luta 3.0.1</title>
 
   <style>
     body {
-      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+      background: linear-gradient(180deg, #1a1a2e, #16213e, #0f0f23);
       overflow: hidden;
       margin: 0;
-      font-family: 'Arial', sans-serif;
+      font-family: Arial;
     }
 
     #arena {
       position: relative;
       width: 100vw;
-      height: 100vh;
+      height: calc(100vh - 80px);
       background: linear-gradient(to bottom, transparent 70%, #8B4513 100%);
     }
 
     .player {
       position: absolute;
       bottom: 80px;
-      transition: left 0.2s ease;
-      z-index: 10;
+      transition: transform .1s;
     }
 
     .player img {
@@ -32,28 +31,17 @@
       height: 140px;
       object-fit: contain;
       image-rendering: pixelated;
-      transition: opacity 0.3s ease;
-      border: 2px solid transparent;
-    }
-
-    .player.atacando img {
-      border-color: #ffaa00 !important;
-      box-shadow: 0 0 20px #ffaa00;
-      transform: scale(1.15);
-    }
-
-    .player.especial img {
-      border-color: #ff00ff !important;
-      box-shadow: 0 0 30px #ff00ff;
-      transform: scale(1.2);
+      filter: drop-shadow(0 0 10px currentColor);
+      user-select: none;
+      pointer-events: none;
     }
 
     #p1 {
-      left: 100px;
+      left: 100px
     }
 
     #p2 {
-      right: 100px;
+      right: 100px
     }
 
     .barra {
@@ -61,81 +49,65 @@
       top: 20px;
       width: 250px;
       height: 25px;
-      background: linear-gradient(90deg, #ff4444, #cc0000);
-      border: 3px solid #660000;
-      border-radius: 15px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      background: #550000;
+      border-radius: 12px;
+      z-index: 10;
     }
 
     #vida1 {
-      left: 50px;
+      left: 50px
     }
 
     #vida2 {
-      right: 50px;
+      right: 50px
     }
 
     .vida {
       height: 100%;
       background: linear-gradient(90deg, #00ff88, #00cc66);
       border-radius: 12px;
-      transition: width 0.5s ease;
+      transition: width .4s ease;
       box-shadow: 0 0 10px #00ff88;
-      position: relative;
     }
 
-    .vida::after {
-      content: attr(data-percent) '%';
+    #ui {
       position: absolute;
-      right: 5px;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 70px;
+      left: 10px;
       color: white;
-      font-weight: bold;
-      font-size: 12px;
-      text-shadow: 1px 1px 2px black;
+      font-size: 14px;
+      background: rgba(0, 0, 0, .6);
+      padding: 8px;
+      border-radius: 5px;
     }
 
-    /* 🎮 CONTROLES VISUAIS */
     #controles {
-      position: absolute;
-      top: 80px;
+      position: fixed;
+      bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.9);
-      color: white;
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 14px;
-      max-width: 450px;
-      text-align: center;
-      border: 2px solid #00ff88;
-    }
-
-    #controles h3 {
-      margin: 0 0 10px 0;
       color: #00ff88;
+      font-size: 14px;
+      text-align: center;
+      background: rgba(0, 0, 0, .8);
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 2px solid #00ff88;
+      z-index: 100;
     }
   </style>
 </head>
 
 <body>
+
   <div id="arena">
+
     <div id="vida1" class="barra">
-      <div id="vidaP1" class="vida" data-percent="100">PLAYER 1</div>
+      <div id="vidaP1" class="vida"></div>
     </div>
 
     <div id="vida2" class="barra">
-      <div id="vidaP2" class="vida" data-percent="100">PLAYER 2</div>
-    </div>
-
-    <!-- 🎮 CONTROLES ADICIONADOS -->
-    <div id="controles">
-      <h3>🎮 CONTROLES</h3>
-      <div><strong>P1:</strong> A/D=Mover | S=Defesa | <span style="color:#ff6600">W=Soco</span> | <span
-          style="color:#ffaa00">E=Chute</span> | <span style="color:#ff00ff">Q=Especial</span></div>
-      <div><strong>P2:</strong> ←→=Mover | ↓=Defesa | <span style="color:#ff6600">↑=Soco</span> | <span
-          style="color:#ffaa00">O=Chute</span> | <span style="color:#ff00ff">P=Especial</span></div>
+      <div id="vidaP2" class="vida"></div>
     </div>
 
     <div id="p1" class="player">
@@ -145,25 +117,48 @@
     <div id="p2" class="player">
       <img id="p2img" src="./Gemini_Generated_Image_l88erjl88erjl88e.png">
     </div>
+
+    <div id="ui">
+      Cooldown P1: <span id="cdP1">0</span> |
+      P2: <span id="cdP2">0</span>
+    </div>
+
+  </div>
+
+  <div id="controles">
+
+    <b>🎮 CONTROLES</b><br>
+
+    P1: A/D mover • S defesa • W soco • E chute • Q especial<br>
+    P2: ←→ mover • ↓ defesa • ↑ soco • O chute • P especial
+
   </div>
 
   <script>
-    let p1X = 100;
-    let p2X = window.innerWidth - 220;
-    let p1Vida = 100;
-    let p2Vida = 100;
-    let p1Defesa = false;
-    let p2Defesa = false;
-    let p1Cooldown = 0;
-    let p2Cooldown = 0;
-    let keysPressed = new Set();
 
-    const p1 = document.getElementById("p1");
-    const p2 = document.getElementById("p2");
-    const p1Img = document.getElementById("p1img");
-    const p2Img = document.getElementById("p2img");
-    const vidaP1 = document.getElementById("vidaP1");
-    const vidaP2 = document.getElementById("vidaP2");
+    let p1X = 100, p1Vx = 0
+    let p2X = window.innerWidth - 220, p2Vx = 0
+
+    let p1Vida = 100, p2Vida = 100
+
+    let p1Defesa = false, p2Defesa = false
+
+    let p1Cooldown = 0, p2Cooldown = 0
+
+    let p1Especial = false, p2Especial = false
+
+    let p1Atacando = false, p2Atacando = false
+
+    let keysPressed = new Set()
+
+    const p1 = document.getElementById("p1")
+    const p2 = document.getElementById("p2")
+
+    const p1Img = document.getElementById("p1img")
+    const p2Img = document.getElementById("p2img")
+
+    const vidaP1 = document.getElementById("vidaP1")
+    const vidaP2 = document.getElementById("vidaP2")
 
     const spritesP1 = {
       IDLE: "./Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png",
@@ -172,126 +167,267 @@
       DEFESA: "./Gemini_Generated_Image_gw8dvmgw8dvmgw8d.png",
       CORRER: "./Gemini_Generated_Image_2c86rh2c86rh2c86.png",
       ESPECIAL: "./Gemini_Generated_Image_3d02v03d02v03d02.png"
-    };
+    }
 
     const spritesP2 = {
       IDLE: "./Gemini_Generated_Image_l88erjl88erjl88e.png",
       SOCO: "./Gemini_Generated_Image_inom8ninom8ninom.png",
-      CHUTE: "./Gemini_Generated_Image_riho7oriho7oriho.png",
+      CHUTE: "./Gemini_Generated_Image_w4oc5dw4oc5dw4oc.png",
       DEFESA: "./Gemini_Generated_Image_l88erjl88erjl88e.png",
       CORRER: "./Gemini_Generated_Image_577txo577txo577t.png",
-      ESPECIAL: "./Gemini_Generated_Image_y3ltr0y3ltr0y3lt.png",
+      ESPECIAL1: "./Gemini_Generated_Image_y3ltr0y3ltr0y3lt.png",
       ESPECIAL2: "./Gemini_Generated_Image_riho7oriho7oriho.png",
       ESPECIAL3: "./Gemini_Generated_Image_bnydkebnydkebnyd.png"
-    };
+    }
 
     function trocarImagem(player, estado) {
-      const img = player === 1 ? p1Img : p2Img;
-      const playerDiv = player === 1 ? p1 : p2;
-      const sprites = player === 1 ? spritesP1 : spritesP2;
 
-      if (sprites[estado]) {
-        img.src = sprites[estado];
-        playerDiv.classList.remove('atacando', 'especial');
-        if (estado === 'SOCO' || estado === 'CHUTE') playerDiv.classList.add('atacando');
-        if (estado.includes('ESPECIAL')) playerDiv.classList.add('especial');
-      }
+      const img = player === 1 ? p1Img : p2Img
+      const sprites = player === 1 ? spritesP1 : spritesP2
+
+      if (!sprites[estado]) return
+
+      img.src = sprites[estado]
+
     }
 
-    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v))
+    }
 
-    document.addEventListener("keydown", e => keysPressed.add(e.key.toLowerCase()));
-    document.addEventListener("keyup", e => keysPressed.delete(e.key.toLowerCase()));
+    function createParticles(x, y, color) {
+
+      for (let i = 0; i < 8; i++) {
+
+        const dx = (Math.random() - 0.5) * 120
+        const dy = -Math.random() * 60
+
+        const part = document.createElement("div")
+
+        part.style.position = "absolute"
+        part.style.left = x + "px"
+        part.style.top = y + "px"
+        part.style.width = "6px"
+        part.style.height = "6px"
+        part.style.background = color
+        part.style.borderRadius = "50%"
+        part.style.pointerEvents = "none"
+        part.style.transition = "all .4s ease-out"
+
+        document.body.appendChild(part)
+
+        requestAnimationFrame(() => {
+          part.style.transform = `translate(${dx}px,${dy}px)`
+          part.style.opacity = "0"
+        })
+
+        setTimeout(() => part.remove(), 400)
+
+      }
+
+    }
 
     document.addEventListener("keydown", e => {
-      if (e.key.toLowerCase() === 'w' && p1Cooldown <= 0) atacar(1, 'SOCO');
-      if (e.key.toLowerCase() === 'e' && p1Cooldown <= 0) atacar(1, 'CHUTE');
-      if (e.key.toLowerCase() === 'q' && p1Cooldown <= 0) especial(1);
 
-      if (e.key === 'ArrowUp' && p2Cooldown <= 0) atacar(2, 'SOCO');
-      if (e.key.toLowerCase() === 'o' && p2Cooldown <= 0) atacar(2, 'CHUTE');
-      if (e.key.toLowerCase() === 'p' && p2Cooldown <= 0) especial(2);
-    });
+      keysPressed.add(e.key.toLowerCase())
 
-    function processarMovimento() {
-      if (keysPressed.has('a') && p1X > 20) { p1X -= 3; trocarImagem(1, 'CORRER'); }
-      if (keysPressed.has('d') && p1X < window.innerWidth - 300) { p1X += 3; trocarImagem(1, 'CORRER'); }
-      if (keysPressed.has('s')) { p1Defesa = true; trocarImagem(1, 'DEFESA'); }
-      else if (!keysPressed.has('a') && !keysPressed.has('d')) trocarImagem(1, 'IDLE');
+      if (e.repeat) return
 
-      if (keysPressed.has('arrowleft') && p2X > 220) { p2X -= 3; trocarImagem(2, 'CORRER'); }
-      if (keysPressed.has('arrowright') && p2X < window.innerWidth - 120) { p2X += 3; trocarImagem(2, 'CORRER'); }
-      if (keysPressed.has('arrowdown')) { p2Defesa = true; trocarImagem(2, 'DEFESA'); }
-      else if (!keysPressed.has('arrowleft') && !keysPressed.has('arrowright')) trocarImagem(2, 'IDLE');
-    }
+      if (e.key === "w" && p1Cooldown <= 0) atacar(1, "SOCO")
+      if (e.key === "e" && p1Cooldown <= 0) atacar(1, "CHUTE")
+      if (e.key === "q" && p1Cooldown <= 0) especial(1)
+
+      if (e.key === "ArrowUp" && p2Cooldown <= 0) atacar(2, "SOCO")
+      if (e.key === "o" && p2Cooldown <= 0) atacar(2, "CHUTE")
+      if (e.key === "p" && p2Cooldown <= 0) especial(2)
+
+    })
+
+    document.addEventListener("keyup", e => {
+      keysPressed.delete(e.key.toLowerCase())
+    })
 
     function atacar(player, tipo) {
-      const atacanteX = player === 1 ? p1X : p2X;
-      const alvoX = player === 1 ? p2X : p1X;
-      if (Math.abs(atacanteX - alvoX) <= 140) {
-        if (player === 1) p1Cooldown = 40; else p2Cooldown = 20;
-        trocarImagem(player, tipo);
-        const dano = (player === 1 ? p2Defesa : p1Defesa) ? 6 : (tipo === 'CHUTE' ? 14 : 11);
-        if (player === 1) p2Vida -= dano; else p1Vida -= dano;
 
-        // TREMOR
-        document.body.style.animation = 'tremor 0.3s';
-        setTimeout(() => document.body.style.animation = 'none', 300);
+      if (player === 1) {
 
-        setTimeout(() => trocarImagem(player, 'IDLE'), 800);
+        p1Cooldown = 25
+        p1Atacando = true
+
+        trocarImagem(1, tipo)
+
+        if (Math.abs(p1X - p2X) < 140) {
+
+          let dano = tipo === "CHUTE" ? 14 : 10
+
+          if (p2Defesa) dano *= 0.01
+
+          p2Vida -= dano
+
+          createParticles(p2X + 60, 200, "orange")
+
+        }
+
+        setTimeout(() => {
+          p1Atacando = false
+          trocarImagem(1, "IDLE")
+        }, 500)
+
       }
+
+      if (player === 2) {
+
+        p2Cooldown = 25
+        p2Atacando = true
+
+        trocarImagem(2, tipo)
+
+        if (Math.abs(p1X - p2X) < 140) {
+
+          let dano = tipo === "CHUTE" ? 14 : 10
+
+          if (p1Defesa) dano *= 0.01
+
+          p1Vida -= dano
+
+          createParticles(p1X + 60, 200, "orange")
+
+        }
+
+        setTimeout(() => {
+          p2Atacando = false
+          trocarImagem(2, "IDLE")
+        }, 500)
+
+      }
+
     }
 
     function especial(player) {
-      if (player === 1 && p1Cooldown <= 0) {
-        p1Cooldown = 120;
-        trocarImagem(1, 'ESPECIAL');
-        p2Vida -= p2Defesa ? 18 : 35;
-        document.body.style.filter = 'brightness(1.5)';
+
+      if (player === 1) {
+
+        p1Cooldown = 60
+        p1Especial = true
+
+        trocarImagem(1, "ESPECIAL")
+
         setTimeout(() => {
-          document.body.style.filter = 'none';
-          trocarImagem(1, 'IDLE');
-        }, 1200);
+
+          if (!p2Especial && Math.abs(p1X - p2X) < 180) {
+
+            let dano = p2Defesa ? 0.35 : 35
+
+            p2Vida -= dano
+
+            createParticles(p2X + 60, 200, "magenta")
+
+          }
+
+          p1Especial = false
+
+          trocarImagem(1, "IDLE")
+
+        }, 900)
+
       }
 
-      if (player === 2 && p2Cooldown <= 0) {
-        p2Cooldown = 150;
-        trocarImagem(2, 'ESPECIAL');
-        setTimeout(() => trocarImagem(2, 'ESPECIAL2'), 400);
+      if (player === 2) {
+
+        p2Cooldown = 75
+        p2Especial = true
+
+        trocarImagem(2, "ESPECIAL1")
+
+        setTimeout(() => trocarImagem(2, "ESPECIAL2"), 300)
+
         setTimeout(() => {
-          trocarImagem(2, 'ESPECIAL3');
-          const dano = p1Defesa ? 25 : 45;
-          p1Vida -= dano;
-        }, 800);
-        setTimeout(() => trocarImagem(2, 'IDLE'), 1500);
+
+          trocarImagem(2, "ESPECIAL3")
+
+          if (!p1Especial && Math.abs(p1X - p2X) < 180) {
+
+            let dano = p1Defesa ? 0.45 : 45
+
+            p1Vida -= dano
+
+            createParticles(p1X + 60, 200, "magenta")
+
+          }
+
+        }, 600)
+
+        setTimeout(() => {
+
+          p2Especial = false
+
+          trocarImagem(2, "IDLE")
+
+        }, 1200)
+
       }
+
+    }
+
+    function movimento() {
+
+      p1Vx *= 0.85
+
+      if (keysPressed.has("a")) p1Vx = Math.max(p1Vx - 0.4, -4)
+      if (keysPressed.has("d")) p1Vx = Math.min(p1Vx + 0.4, 4)
+
+      p1X += p1Vx
+
+      p1Defesa = keysPressed.has("s")
+
+      if (p1Defesa) trocarImagem(1, "DEFESA")
+
+      p2Vx *= 0.85
+
+      if (keysPressed.has("arrowleft")) p2Vx = Math.max(p2Vx - 0.4, -4)
+      if (keysPressed.has("arrowright")) p2Vx = Math.min(p2Vx + 0.4, 4)
+
+      p2X += p2Vx
+
+      p2Defesa = keysPressed.has("arrowdown")
+
+      if (p2Defesa) trocarImagem(2, "DEFESA")
+
     }
 
     function atualizar() {
-      processarMovimento();
-      if (p1Cooldown > 0) p1Cooldown--;
-      if (p2Cooldown > 0) p2Cooldown--;
-      p1X = clamp(p1X, 20, window.innerWidth - 300);
-      p2X = clamp(p2X, 220, window.innerWidth - 120);
-      p1.style.left = p1X + "px";
-      p2.style.left = p2X + "px";
-      vidaP1.style.width = Math.max(0, p1Vida) + "%";
-      vidaP2.style.width = Math.max(0, p2Vida) + "%";
-      vidaP1.setAttribute('data-percent', Math.round(Math.max(0, p1Vida)));
-      vidaP2.setAttribute('data-percent', Math.round(Math.max(0, p2Vida)));
 
-      if (p1Vida <= 0) { alert("🏆 PLAYER 2 VENCEU! F5 p/ novo jogo"); location.reload(); }
-      if (p2Vida <= 0) { alert("🏆 PLAYER 1 VENCEU! F5 p/ novo jogo"); location.reload(); }
-      requestAnimationFrame(atualizar);
+      movimento()
+
+      if (p1Cooldown > 0) p1Cooldown--
+      if (p2Cooldown > 0) p2Cooldown--
+
+      p1X = clamp(p1X, 20, window.innerWidth - 300)
+      p2X = clamp(p2X, 220, window.innerWidth - 120)
+
+      p1.style.left = p1X + "px"
+      p2.style.left = p2X + "px"
+
+      vidaP1.style.width = Math.max(0, p1Vida) + "%"
+      vidaP2.style.width = Math.max(0, p2Vida) + "%"
+
+      document.getElementById("cdP1").textContent = p1Cooldown
+      document.getElementById("cdP2").textContent = p2Cooldown
+
+      if (p1Vida <= 0) { alert("🏆 PLAYER 2 venceu"); location.reload() }
+      if (p2Vida <= 0) { alert("🏆 PLAYER 1 venceu"); location.reload() }
+
+      requestAnimationFrame(atualizar)
+
     }
 
-    // TREMOR CSS
-    const style = document.createElement('style');
-    style.textContent = '@keyframes tremor{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}50%{transform:translateX(5px);}75%{transform:translateX(-3px);}}body{animation-fill-mode:both;}';
-    document.head.appendChild(style);
+    trocarImagem(1, "IDLE")
+    trocarImagem(2, "IDLE")
 
-    atualizar();
+    atualizar()
+
   </script>
+
 </body>
 
 </html>
