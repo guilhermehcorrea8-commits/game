@@ -1,0 +1,93 @@
+body {
+  background: #0f172a;
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial;
+}
+
+/* ARENA */
+#arena {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* PLAYER */
+.player {
+  position: absolute;
+  bottom: 80px;
+}
+
+.player img {
+  width: 140px;
+  height: 160px;
+  image-rendering: pixelated;
+}
+
+/* VIDA */
+.barra {
+  position: absolute;
+  top: 20px;
+  width: 250px;
+  height: 25px;
+  background: #550000;
+  border-radius: 12px;
+  z-index: 10;
+}
+
+#vida1 { left: 50px; }
+#vida2 { right: 50px; }
+
+.vida {
+  height: 100%;
+  background: lime;
+  border-radius: 12px;
+}
+
+/* UI */
+#ui {
+  position: absolute;
+  top: 70px;
+  left: 10px;
+  color: white;
+}
+
+/* 📜 REGRAS */
+#regrasBox {
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  width: 260px;
+  background: rgba(0,0,0,0.7);
+  padding: 15px;
+  border-radius: 10px;
+  color: #00ff88;
+}
+
+/* 🎮 CONTROLES */
+#controlesBox {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: 260px;
+  background: rgba(0,0,0,0.7);
+  padding: 15px;
+  border-radius: 10px;
+  color: #00ff88;
+}
+
+/* BOTÃO */
+#btnRestart {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px;
+  background: green;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 20;
+}

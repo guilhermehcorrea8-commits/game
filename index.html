@@ -3,99 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Jogo de Luta 3.0.1</title>
-
-  <style>
-    body {
-      background: linear-gradient(180deg, #1a1a2e, #16213e, #0f0f23);
-      overflow: hidden;
-      margin: 0;
-      font-family: Arial;
-    }
-
-    #arena {
-      position: relative;
-      width: 100vw;
-      height: calc(100vh - 80px);
-      background: linear-gradient(to bottom, transparent 70%, #8B4513 100%);
-    }
-
-    .player {
-      position: absolute;
-      bottom: 80px;
-      transition: transform .1s;
-    }
-
-    .player img {
-      width: 120px;
-      height: 140px;
-      object-fit: contain;
-      image-rendering: pixelated;
-      filter: drop-shadow(0 0 10px currentColor);
-      user-select: none;
-      pointer-events: none;
-    }
-
-    #p1 {
-      left: 100px
-    }
-
-    #p2 {
-      right: 100px
-    }
-
-    .barra {
-      position: absolute;
-      top: 20px;
-      width: 250px;
-      height: 25px;
-      background: #550000;
-      border-radius: 12px;
-      z-index: 10;
-    }
-
-    #vida1 {
-      left: 50px
-    }
-
-    #vida2 {
-      right: 50px
-    }
-
-    .vida {
-      height: 100%;
-      background: linear-gradient(90deg, #00ff88, #00cc66);
-      border-radius: 12px;
-      transition: width .4s ease;
-      box-shadow: 0 0 10px #00ff88;
-    }
-
-    #ui {
-      position: absolute;
-      top: 70px;
-      left: 10px;
-      color: white;
-      font-size: 14px;
-      background: rgba(0, 0, 0, .6);
-      padding: 8px;
-      border-radius: 5px;
-    }
-
-    #controles {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #00ff88;
-      font-size: 14px;
-      text-align: center;
-      background: rgba(0, 0, 0, .8);
-      padding: 12px 20px;
-      border-radius: 8px;
-      border: 2px solid #00ff88;
-      z-index: 100;
-    }
-  </style>
+  <title>Jogo de Luta</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -111,11 +20,11 @@
     </div>
 
     <div id="p1" class="player">
-      <img id="p1img" src="./Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png">
+      <img id="p1img" src="./imagens/Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png">
     </div>
 
     <div id="p2" class="player">
-      <img id="p2img" src="./Gemini_Generated_Image_l88erjl88erjl88e.png">
+      <img id="p2img" src="./imagens/Gemini_Generated_Image_l88erjl88erjl88e.png">
     </div>
 
     <div id="ui">
@@ -125,308 +34,28 @@
 
   </div>
 
-  <div id="controles">
-
-    <b>🎮 CONTROLES</b><br>
-
-    P1: A/D mover • S defesa • W soco • E chute • Q especial<br>
-    P2: ←→ mover • ↓ defesa • ↑ soco • O chute • P especial
-
+  <!-- 📜 REGRAS -->
+  <div id="regrasBox">
+    <h2>📜 Regras do Jogo</h2>
+    <p>• Cada jogador começa com 100 de vida</p>
+    <p>• Ataques causam dano quando próximos</p>
+    <p>• Defesa reduz o dano</p>
+    <p>• Especial causa muito dano</p>
+    <p>• O jogo reinicia automaticamente</p>
   </div>
 
-  <script>
-
-    let p1X = 100, p1Vx = 0
-    let p2X = window.innerWidth - 220, p2Vx = 0
-
-    let p1Vida = 100, p2Vida = 100
-
-    let p1Defesa = false, p2Defesa = false
-
-    let p1Cooldown = 0, p2Cooldown = 0
-
-    let p1Especial = false, p2Especial = false
-
-    let p1Atacando = false, p2Atacando = false
-
-    let keysPressed = new Set()
-
-    const p1 = document.getElementById("p1")
-    const p2 = document.getElementById("p2")
-
-    const p1Img = document.getElementById("p1img")
-    const p2Img = document.getElementById("p2img")
-
-    const vidaP1 = document.getElementById("vidaP1")
-    const vidaP2 = document.getElementById("vidaP2")
-
-    const spritesP1 = {
-      IDLE: "./Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png",
-      SOCO: "./Gemini_Generated_Image_2703an2703an2703.png",
-      CHUTE: "./Gemini_Generated_Image_l3yczwl3yczwl3yc.png",
-      DEFESA: "./Gemini_Generated_Image_gw8dvmgw8dvmgw8d.png",
-      CORRER: "./Gemini_Generated_Image_2c86rh2c86rh2c86.png",
-      ESPECIAL: "./Gemini_Generated_Image_3d02v03d02v03d02.png"
-    }
-
-    const spritesP2 = {
-      IDLE: "./Gemini_Generated_Image_l88erjl88erjl88e.png",
-      SOCO: "./Gemini_Generated_Image_inom8ninom8ninom.png",
-      CHUTE: "./Gemini_Generated_Image_w4oc5dw4oc5dw4oc.png",
-      DEFESA: "./Gemini_Generated_Image_l88erjl88erjl88e.png",
-      CORRER: "./Gemini_Generated_Image_577txo577txo577t.png",
-      ESPECIAL1: "./Gemini_Generated_Image_y3ltr0y3ltr0y3lt.png",
-      ESPECIAL2: "./Gemini_Generated_Image_riho7oriho7oriho.png",
-      ESPECIAL3: "./Gemini_Generated_Image_bnydkebnydkebnyd.png"
-    }
-
-    function trocarImagem(player, estado) {
-
-      const img = player === 1 ? p1Img : p2Img
-      const sprites = player === 1 ? spritesP1 : spritesP2
-
-      if (!sprites[estado]) return
-
-      img.src = sprites[estado]
-
-    }
-
-    function clamp(v, min, max) {
-      return Math.max(min, Math.min(max, v))
-    }
-
-    function createParticles(x, y, color) {
-
-      for (let i = 0; i < 8; i++) {
-
-        const dx = (Math.random() - 0.5) * 120
-        const dy = -Math.random() * 60
-
-        const part = document.createElement("div")
-
-        part.style.position = "absolute"
-        part.style.left = x + "px"
-        part.style.top = y + "px"
-        part.style.width = "6px"
-        part.style.height = "6px"
-        part.style.background = color
-        part.style.borderRadius = "50%"
-        part.style.pointerEvents = "none"
-        part.style.transition = "all .4s ease-out"
-
-        document.body.appendChild(part)
-
-        requestAnimationFrame(() => {
-          part.style.transform = `translate(${dx}px,${dy}px)`
-          part.style.opacity = "0"
-        })
-
-        setTimeout(() => part.remove(), 400)
-
-      }
-
-    }
-
-    document.addEventListener("keydown", e => {
-
-      keysPressed.add(e.key.toLowerCase())
-
-      if (e.repeat) return
-
-      if (e.key === "w" && p1Cooldown <= 0) atacar(1, "SOCO")
-      if (e.key === "e" && p1Cooldown <= 0) atacar(1, "CHUTE")
-      if (e.key === "q" && p1Cooldown <= 0) especial(1)
-
-      if (e.key === "ArrowUp" && p2Cooldown <= 0) atacar(2, "SOCO")
-      if (e.key === "o" && p2Cooldown <= 0) atacar(2, "CHUTE")
-      if (e.key === "p" && p2Cooldown <= 0) especial(2)
-
-    })
-
-    document.addEventListener("keyup", e => {
-      keysPressed.delete(e.key.toLowerCase())
-    })
-
-    function atacar(player, tipo) {
-
-      if (player === 1) {
-
-        p1Cooldown = 25
-        p1Atacando = true
-
-        trocarImagem(1, tipo)
-
-        if (Math.abs(p1X - p2X) < 140) {
-
-          let dano = tipo === "CHUTE" ? 14 : 10
-
-          if (p2Defesa) dano *= 0.01
-
-          p2Vida -= dano
-
-          createParticles(p2X + 60, 200, "orange")
-
-        }
-
-        setTimeout(() => {
-          p1Atacando = false
-          trocarImagem(1, "IDLE")
-        }, 500)
-
-      }
-
-      if (player === 2) {
-
-        p2Cooldown = 25
-        p2Atacando = true
-
-        trocarImagem(2, tipo)
-
-        if (Math.abs(p1X - p2X) < 140) {
-
-          let dano = tipo === "CHUTE" ? 14 : 10
-
-          if (p1Defesa) dano *= 0.01
-
-          p1Vida -= dano
-
-          createParticles(p1X + 60, 200, "orange")
-
-        }
-
-        setTimeout(() => {
-          p2Atacando = false
-          trocarImagem(2, "IDLE")
-        }, 500)
-
-      }
-
-    }
-
-    function especial(player) {
-
-      if (player === 1) {
-
-        p1Cooldown = 60
-        p1Especial = true
-
-        trocarImagem(1, "ESPECIAL")
-
-        setTimeout(() => {
-
-          if (!p2Especial && Math.abs(p1X - p2X) < 180) {
-
-            let dano = p2Defesa ? 0.35 : 35
-
-            p2Vida -= dano
-
-            createParticles(p2X + 60, 200, "magenta")
-
-          }
-
-          p1Especial = false
-
-          trocarImagem(1, "IDLE")
-
-        }, 900)
-
-      }
-
-      if (player === 2) {
-
-        p2Cooldown = 75
-        p2Especial = true
-
-        trocarImagem(2, "ESPECIAL1")
-
-        setTimeout(() => trocarImagem(2, "ESPECIAL2"), 300)
-
-        setTimeout(() => {
-
-          trocarImagem(2, "ESPECIAL3")
-
-          if (!p1Especial && Math.abs(p1X - p2X) < 180) {
-
-            let dano = p1Defesa ? 0.45 : 45
-
-            p1Vida -= dano
-
-            createParticles(p1X + 60, 200, "magenta")
-
-          }
-
-        }, 600)
-
-        setTimeout(() => {
-
-          p2Especial = false
-
-          trocarImagem(2, "IDLE")
-
-        }, 1200)
-
-      }
-
-    }
-
-    function movimento() {
-
-      p1Vx *= 0.85
-
-      if (keysPressed.has("a")) p1Vx = Math.max(p1Vx - 0.4, -4)
-      if (keysPressed.has("d")) p1Vx = Math.min(p1Vx + 0.4, 4)
-
-      p1X += p1Vx
-
-      p1Defesa = keysPressed.has("s")
-
-      if (p1Defesa) trocarImagem(1, "DEFESA")
-
-      p2Vx *= 0.85
-
-      if (keysPressed.has("arrowleft")) p2Vx = Math.max(p2Vx - 0.4, -4)
-      if (keysPressed.has("arrowright")) p2Vx = Math.min(p2Vx + 0.4, 4)
-
-      p2X += p2Vx
-
-      p2Defesa = keysPressed.has("arrowdown")
-
-      if (p2Defesa) trocarImagem(2, "DEFESA")
-
-    }
-
-    function atualizar() {
-
-      movimento()
-
-      if (p1Cooldown > 0) p1Cooldown--
-      if (p2Cooldown > 0) p2Cooldown--
-
-      p1X = clamp(p1X, 20, window.innerWidth - 300)
-      p2X = clamp(p2X, 220, window.innerWidth - 120)
-
-      p1.style.left = p1X + "px"
-      p2.style.left = p2X + "px"
-
-      vidaP1.style.width = Math.max(0, p1Vida) + "%"
-      vidaP2.style.width = Math.max(0, p2Vida) + "%"
-
-      document.getElementById("cdP1").textContent = p1Cooldown
-      document.getElementById("cdP2").textContent = p2Cooldown
-
-      if (p1Vida <= 0) { alert("🏆 PLAYER 2 venceu"); location.reload() }
-      if (p2Vida <= 0) { alert("🏆 PLAYER 1 venceu"); location.reload() }
-
-      requestAnimationFrame(atualizar)
-
-    }
-
-    trocarImagem(1, "IDLE")
-    trocarImagem(2, "IDLE")
-
-    atualizar()
-
-  </script>
+  <!-- 🎮 CONTROLES -->
+  <div id="controlesBox">
+    <h2>🎮 Controles</h2>
+    <p><b>P1</b>: A/D mover • S defesa • W soco • E chute • Q especial</p>
+    <p><b>P2</b>: ← → mover • ↓ defesa • ↑ soco • O chute • P especial</p>
+    <p>🔄 Pressione <b>R</b> para reiniciar</p>
+  </div>
+
+  <!-- BOTÃO -->
+  <button id="btnRestart">🔄 Reiniciar</button>
+
+  <script type="module" src="main.js"></script>
 
 </body>
 
