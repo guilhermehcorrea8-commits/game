@@ -1,10 +1,5 @@
 import { database } from "./firebaseConfig.js";
-import {
-  ref,
-  push,
-  set,
-  get
-} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+import { ref, push, set, get } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
 const refDB = ref(database, "luta");
 

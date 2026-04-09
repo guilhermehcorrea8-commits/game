@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
   <meta charset="UTF-8">
   <title>Jogo de Luta</title>
@@ -9,54 +8,46 @@
 
 <body>
 
-  <div id="arena">
+<div id="arena">
 
-    <div id="vida1" class="barra">
-      <div id="vidaP1" class="vida"></div>
-    </div>
-
-    <div id="vida2" class="barra">
-      <div id="vidaP2" class="vida"></div>
-    </div>
-
-    <div id="p1" class="player">
-      <img id="p1img" src="./imagens/Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png">
-    </div>
-
-    <div id="p2" class="player">
-      <img id="p2img" src="./imagens/Gemini_Generated_Image_l88erjl88erjl88e.png">
-    </div>
-
-    <div id="ui">
-      Cooldown P1: <span id="cdP1">0</span> |
-      P2: <span id="cdP2">0</span>
-    </div>
-
+  <div id="vida1" class="barra">
+    <div id="vidaP1" class="vida"></div>
   </div>
 
-  <!-- 📜 REGRAS -->
-  <div id="regrasBox">
-    <h2>📜 Regras do Jogo</h2>
-    <p>• Cada jogador começa com 100 de vida</p>
-    <p>• Ataques causam dano quando próximos</p>
-    <p>• Defesa reduz o dano</p>
-    <p>• Especial causa muito dano</p>
-    <p>• O jogo reinicia automaticamente</p>
+  <div id="vida2" class="barra">
+    <div id="vidaP2" class="vida"></div>
   </div>
 
-  <!-- 🎮 CONTROLES -->
-  <div id="controlesBox">
-    <h2>🎮 Controles</h2>
-    <p><b>P1</b>: A/D mover • S defesa • W soco • E chute • Q especial</p>
-    <p><b>P2</b>: ← → mover • ↓ defesa • ↑ soco • O chute • P especial</p>
-    <p>🔄 Pressione <b>R</b> para reiniciar</p>
+  <div id="p1" class="player">
+    <img id="p1img" src="./imagens/Gemini_Generated_Image_4w6ctc4w6ctc4w6c.png">
   </div>
 
-  <!-- BOTÃO -->
-  <button id="btnRestart">🔄 Reiniciar</button>
+  <div id="p2" class="player">
+    <img id="p2img" src="./imagens/Gemini_Generated_Image_l88erjl88erjl88e.png">
+  </div>
 
-  <script type="module" src="main.js"></script>
+  <div id="ui">
+    Cooldown P1: <span id="cdP1">0</span> |
+    P2: <span id="cdP2">0</span>
+  </div>
 
+</div>
+
+<div id="regrasBox">
+  <h2>📜 Regras</h2>
+  <p>Vida inicial: 100</p>
+  <p>Defesa reduz dano</p>
+  <p>Especial = alto dano</p>
+</div>
+
+<div id="controlesBox">
+  <h2>🎮 Controles</h2>
+  <p>P1: A/D • S • W • E • Q</p>
+  <p>P2: ← → • ↓ • ↑ • O • P</p>
+</div>
+
+<button id="btnRestart">🔄 Reiniciar</button>
+
+<script type="module" src="main.js"></script>
 </body>
-
 </html>

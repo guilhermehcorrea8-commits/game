@@ -11,7 +11,6 @@ async function atualizarGrafico() {
 
   for (let id in dados) {
     const d = dados[id];
-
     labels.push(new Date(d.timestamp).toLocaleTimeString());
     p1.push(d.p1);
     p2.push(d.p2);
